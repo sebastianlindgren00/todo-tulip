@@ -10,6 +10,8 @@ import { goto } from '$app/navigation';
 const pbURL = "https://todo-tulip.pockethost.io/"
 export const pb = new PocketBase(pbURL); // remote
 export const currentUser = writable(pb.authStore.model);
+export const cachedUsers = writable([]);
+export const cachedAvatars = writable([{ userId: '', url: '' }]);
 
 pb.authStore.onChange(() => {
     currentUser.set(pb.authStore.model);
@@ -38,6 +40,10 @@ export async function getAvatar(userId: string, fileName: string) {
         const record = await pb.collection('users').getOne(userId, { requestKey: null });
         const url = pb.files.getUrl(record, fileName, { 'thumb': '100x250' });
 
+        cachedAvatars.update((avatars) => [...avatars, { userId: userId, url: url }]);
+        console.log('cachedAvatar: ', { userId: userId, url: url });
+
+
         return url;
     } catch (error) {
         console.error(error);
@@ -46,18 +52,6 @@ export async function getAvatar(userId: string, fileName: string) {
 /* #endregion */
 
 /* #region Get users */
-export async function getUsers() {
-    try {
-        // fetch a paginated records list
-        const resultList = await pb.collection('users').getList(1, 50, {
-            sort: 'created',
-        });
-        return resultList;
-    } catch (error) {
-        console.error("Get users: ", error);
-    }
-}
-
 export async function getUserByUsername(username: string) {
     if (username == "") {
         return null;
@@ -68,6 +62,9 @@ export async function getUserByUsername(username: string) {
         const user = await pb.collection('users').getFirstListItem(`username = "${username}"`, {
             sort: 'created',
         });
+
+        cachedUsers.update((users) => [...users, user]);
+
         return user;
     } catch (error) {
         console.error("Get user by username: ", error);
@@ -82,20 +79,20 @@ export async function getUsersByIds(userIds: string[]) {
     try {
         // Get user details for the provided user IDs
         const users = await pb.collection('users').getList(1, 50, {
+            requestKey: null,
             filter: userIds.map((id) => `id="${id}"`).join("||"),
-            requestKey: null
         });
-        console.log('Users.items: ',users.items);
-        console.log('UserIds: ',userIds);
-        console.log('Users: ',users);
         return users.items;
     }
     catch (error) {
         console.error("Get users by IDs: ", error);
-        //return [];
+        return [];
     }
 }
 
+/* #endregion */
+
+/* #region Friend functionality */
 export async function sendFriendRequest(friendId: string) {
     try {
         const currentUser = pb.authStore.model;
@@ -130,6 +127,38 @@ export async function sendFriendRequest(friendId: string) {
         return createdRequest;
     } catch (error) {
         console.error("Send friend request: ", error);
+    }
+}
+
+export async function acceptFriendRequest(friendId: string) {
+    try {
+        const currentUser = pb.authStore.model;
+        const user = await pb.collection('users').getOne(currentUser.id);
+
+        // Remove the friend request from the user's friend_requests
+        const friendRequests = user.friend_requests.filter((id: string) => id !== friendId);
+
+        // Add the friend to the user's friends
+        const friends = [...user.friends, friendId];
+
+        // Update the user's record
+        const updatedUser = await pb.collection('users').update(currentUser.id, {
+            friends: friends,
+            friend_requests: friendRequests
+        });
+
+        // Add the user to the friend's friends
+        const friend = await pb.collection('users').getOne(friendId);
+        const friendFriends = [...friend.friends, currentUser.id];
+
+        // Update the friend's record
+        const updatedFriend = await pb.collection('users').update(friendId, {
+            friends: friendFriends
+        });
+
+        return updatedUser && updatedFriend;
+    } catch (error) {
+        console.error("Accept friend request: ", error);
     }
 }
 /* #endregion */
@@ -178,7 +207,7 @@ export async function getLists() {
             sort: 'created',
             filter: `owner = "${userId}" || shared ?~ "${userId}" || isPublic = true`
         });
-        return resultList;
+        return resultList.items;
     } catch (error) {
         console.error("Get lists: ", error);
     }
@@ -192,7 +221,7 @@ export async function getItems(listId: string) {
             sort: 'created',
             filter: `list.id = "${listId}"`
         });
-        return resultList;
+        return resultList.items;
     } catch (error) {
         console.error("Get items: ", error);
     }
@@ -250,7 +279,7 @@ export async function deleteList(listId: string) {
     try {
         // delete the items in the list
         const resultList = await getItems(listId);
-        resultList.items.forEach(async (item: { id: string }) => { // Specify the type of 'item' as { id: string }
+        resultList.forEach(async (item: { id: string }) => { // Specify the type of 'item' as { id: string }
             await deleteItem(item.id);
         });
 
