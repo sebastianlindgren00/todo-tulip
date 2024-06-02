@@ -7,7 +7,7 @@
     getUserByUsername,
     deleteFriend,
     getFriends,
-    getFriendRequests,
+    getRequests,
     acceptFriendRequest,
     rejectFriendRequest,
   } from "@lib/pocketbase";
@@ -22,16 +22,15 @@
   let openAddPopup, closeAddPopup;
   let openRequestsPopup, closeRequestsPopup;
   let friends = [];
-  let friendRequests = [];
-  let sentRequests = [];
   let friendId = "";
   let friendUserName = "";
+  let requests = { received: [], sent: [] };
 
   onMount(async () => {
+    console.log("currentUser", $currentUser);
+
     friends = await getFriends();
-    friendRequests = await getFriendRequests();
-    sentRequests = await getUsersByIds($currentUser.sent_requests);
-    console.log("sent requests", sentRequests);
+    requests = await getRequests();
 
     pb.collection("users").subscribe(
       "*",
@@ -40,8 +39,8 @@
           case "update":
             if (e.record.id === $currentUser.id) {
               friends = await getUsersByIds(e.record.friends);
-              friendRequests = await getUsersByIds(e.record.friend_requests);
-              sentRequests = await getUsersByIds(e.record.sent_requests);
+              requests.received = await getUsersByIds(e.record.friend_requests);
+              requests.sent = await getUsersByIds(e.record.sent_requests);
             }
             break;
         }
@@ -70,7 +69,7 @@
       </div>
     </div>
   {/each}
-  {#each sentRequests as request}
+  {#each requests.sent as request}
     <div class="friend-card flex pb-4 grayscale">
       <AccountInformation user={request} className="w-14 h-14" />
       <div class="self-center ml-3">
@@ -92,12 +91,12 @@
   </Popup>
   <div class="absolute bottom-3 left-0 w-full px-3 flex h-12">
     <FilledButton customStyles="w-full" onClick={openAddPopup} text="Lägg till vän" />
-    {#if friendRequests.length > 0}
+    {#if requests.received.length > 0}
       <div class="ml-2 w-12 relative">
         <div
           class="absolute mr-[-5px] mt-[-5px] -right-1 -top-1 h-5 w-5 z-50 bg-red-500 rounded-full text-textLight text-xs flex items-center justify-center"
         >
-          {friendRequests.length}
+          {requests.received.length}
         </div>
         <IconButton
           icon="MailBoxSolid"
@@ -112,7 +111,7 @@
     <div class="px-2">
       <h3 class="text-center">Vänförfrågningar</h3>
       <div class="grid gap-y-3">
-        {#each friendRequests as request}
+        {#each requests.received as request}
           <div class="flex justify-between">
             <p class="self-center">{request.name}</p>
             <div class="grid-cols-2 gap-3">

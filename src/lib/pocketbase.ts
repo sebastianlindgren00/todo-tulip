@@ -18,6 +18,9 @@ pb.authStore.onChange(() => {
     currentUser.set(pb.authStore.model);
 });
 
+console.log("Auth store changed", pb.authStore.model);
+
+
 /* #region Avatar */
 async function generateAvatar(seed: string) {
     const svg = createAvatar(thumbs, {
@@ -157,7 +160,7 @@ export async function acceptFriendRequest(friendId: string) {
             friends: friendFriends,
             requestKey: null,
             sent_requests: friend.sent_requests.filter((id: string) => id !== currentUser.id)
-            
+
         });
 
 
@@ -182,7 +185,7 @@ export async function rejectFriendRequest(friendId: string) {
 
         const updatedFriend = await pb.collection('users').update(friendId, {
             sent_requests: user.sent_requests.filter((id: string) => id !== currentUser.id)
-        }); 
+        });
 
         return updatedUser && updatedFriend;
     } catch (error) {
@@ -208,16 +211,20 @@ export async function getFriends() {
     }
 }
 
-export async function getFriendRequests() {
+export async function getRequests() {
     try {
         const userId = pb.authStore.model?.id;
 
         // fetch a paginated records list
         const record = await pb.collection('users').getOne(userId, {
-            expand: 'friend_requests'
+            expand: 'friend_requests, sent_requests'
         });
 
-        return await getUsersByIds(record.friend_requests);
+        console.log("friend req: ", record.friend_requests, "sent req: ", record.sent_requests);
+
+        return {
+            received: await getUsersByIds(record.sent_requests), sent: await getUsersByIds(record.sent_requests)
+        };
     } catch (error) {
         console.error("Get friend requests: ", error);
     }
