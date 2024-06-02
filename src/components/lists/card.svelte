@@ -100,47 +100,51 @@
 </script>
 
 {#if !useDeletionSlide2}
-  <div
-    transition:slide={{ delay: 100, duration: 300, easing: quintOut, axis: "x" }}
-    id={listId}
-    class="bg-slate-100 rounded-2xl p-6 w-96 soft-shadow mx-2 transition-all h-min"
-  >
-    <div class="mb-4 flex items-center justify-between">
-      <h2>{listName}</h2>
-      {#if $currentUser.id != listOwner}
-        <UnsubscribeButton {listName} {listId} {sharedUserNames} {animateExit} />
-      {:else}
-        <IconButton icon="TrashBinSolid" color="bg-red-500" size="medium" onClick={handleDelete} />
-      {/if}
-    </div>
-    <!-- Showcase the shared users -->
-    {#if sharedUsers.length > 0}
-      <div class="mb-4">
-        <p class="text-sm font-semibold">Shared with:</p>
-        <ul class="list-disc list-inside">
-          {#each sharedUserNames as user}
-            <div class="flex items-center">
-              <p>{user.name}</p>
-              <!-- <AccountInformation user={user} /> -->
-              <Avatar className="w-5 h-5 ml-3" userId={user.id} avatarFile={user.avatar} />
-            </div>
-          {/each}
-        </ul>
-      </div>
-    {/if}
-    {#if !useDeletionSlide1}
-      <div transition:slide={{ delay: 100, duration: 300, easing: quintOut, axis: "y" }}>
-        {#each items as item}
-          <ListItem
-            itemId={item.id}
-            creatorId={item.creator}
-            title={item.content.title}
-            text={item.content.text}
-            priority={item.priority}
-          />
-        {/each}
-        <CreateItem {listId} />
-      </div>
-    {/if}
-  </div>
+	<div
+		transition:slide={{ delay: 100, duration: 300, easing: quintOut, axis: 'x' }}
+		id={listId}
+		class="bg-slate-100 rounded-2xl p-6 w-96 soft-shadow mx-2 transition-all h-min"
+	>
+		<div class="mb-4 flex items-center justify-between">
+			<h2>{listName}</h2>
+			{#if $currentUser.id != listOwner}
+				<UnsubscribeButton {listName} {listId} {sharedUserNames} {animateExit} />
+			{:else}
+				<IconButton icon="CloseCircleSolid" color="bg-red-500" size="medium" onClick={handleDelete} />
+			{/if}
+		</div>
+		<!-- Showcase the shared users -->
+		{#if sharedUsers.length > 0}
+			<div class="mb-4">
+				<p class="text-sm font-semibold">Delas med:</p>
+				<ul class="list-disc list-inside">
+					{#each sharedUserNames as user}
+						<div class="flex items-center">
+							{#if user.id == $currentUser.id}
+							<p>Mig</p>
+							{:else}
+							<p>{user.name}</p>
+							{/if}
+							<!-- <AccountInformation user={user} /> -->
+							<Avatar className="w-5 h-5 ml-3" userId={user.id} avatarFile={user.avatar} />
+						</div>
+					{/each}
+				</ul>
+			</div>
+		{/if}
+		{#if !useDeletionSlide1}
+			<div transition:slide={{ delay: 100, duration: 300, easing: quintOut, axis: 'y' }}>
+				{#each items as item}
+					<ListItem
+						itemId={item.id}
+						creatorId={item.creator}
+						title={item.content.title}
+						text={item.content.text}
+						priority={item.priority}
+					/>
+				{/each}
+				<CreateItem {listId} />
+			</div>
+		{/if}
+	</div>
 {/if}

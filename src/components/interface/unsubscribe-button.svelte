@@ -3,6 +3,7 @@
   import FilledButton from "./filledButton.svelte";
   import Popup from "../layout/popup.svelte";
   import SubmitButton from "./submit-button.svelte";
+  import IconButton from './icon-button.svelte';
 
   let openPopup, closePopup;
   let users = [];
@@ -34,7 +35,7 @@
 </script>
 
 <div>
-  <FilledButton customStyles="w-full" onClick={openPopup} text="Avprenumerera" />
+    <IconButton icon="CircleMinusSolid" customStyles="bg-yellow-300" size="medium" onClick={openPopup} />
 </div>
 
 <Popup bind:open={openPopup} bind:close={closePopup}>

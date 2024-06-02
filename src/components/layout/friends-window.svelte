@@ -27,11 +27,9 @@
   let friendId = "";
   let friendUserName = "";
 
-  // TODO : ADD REMOVE FRIEND AND TRANSFER FUNCTIONS INTO LIB
-
-  onMount(async () => {
-    friends = await getFriends();
-    friendRequests = await getFriendRequests();
+	onMount(async () => {
+		friends = await getFriends();
+		friendRequests = await getFriendRequests();
 
     pb.collection("users").subscribe(
       "*",
@@ -75,7 +73,7 @@
       <AccountInformation user={friend} />
       <p>{friend.name}</p>
       <IconButton
-        icon="TrashBinSolid"
+        icon="UserRemoveSolid"
         color="bg-red-500"
         size="small"
         onClick={() => handleDelete(friend.id)}
