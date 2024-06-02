@@ -8,6 +8,7 @@
 	import { slide } from 'svelte/transition';
 	import Avatar from '@components/interface/avatar.svelte';
 	import UnsubscribeButton from '@components/interface/unsubscribe-button.svelte';
+    import AccountInformation from '@components/layout/account-information.svelte';
 
 	export let listName = '[name]';
 	export let listId;
@@ -78,12 +79,11 @@
 
 	onMount(async () => {
 		try {
-            console.log('Shared users 1:', sharedUsers); // why
-			const sharedUserNames = await getUsersByIds(sharedUsers); // won't
-            console.log('Shared users 2:', sharedUserNames); // this
-            console.log('shared 1 username:', sharedUserNames[0].name); // work
-		} catch (error) { // in 
-			console.error('onMount - Error fetching user details: ', error); // line 123-128
+            console.log('Shared users 1:', sharedUsers); 
+			sharedUserNames = await getUsersByIds(sharedUsers); 
+            console.log('Shared users 2:', sharedUserNames); 
+		} catch (error) { 
+			console.error('onMount - Error fetching user details: ', error); 
 		}
 	});
 
@@ -123,6 +123,7 @@
 					{#each sharedUserNames as user}
 						<div class="flex items-center">
 							<p>{user.name}</p>
+							<!-- <AccountInformation user={user} /> -->
 							<Avatar className="w-5 h-5 ml-3" userId={user.id} avatarFile={user.avatar} />
 						</div>
 					{/each}

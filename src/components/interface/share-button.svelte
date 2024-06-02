@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { getUsers } from '../../lib/pocketbase'; // Assuming you have a module to handle Pocketbase integration
+    import { getFriends } from '../../lib/pocketbase'; // Assuming you have a module to handle Pocketbase integration
     import FilledButton from './filledButton.svelte';
     import Popup from '../layout/popup.svelte';
     import { Search, Button } from 'flowbite-svelte'; // search button
@@ -17,16 +17,17 @@
     export let shared = [];
 
     onMount(async () => {
-        const result = await getUsers();
-        users = result.items.map(item => ({ id: item.id, name: item.name }));
+        const result = await getFriends();
+        console.log('friends:', result);
+        users = result.map(item => ({ id: item.id, name: item.name }));
         filterUsers(); // filtering on mount
     });
 
     // Function to filter users based on search term
     const filterUsers = () => {
     if(searchTerm.length > 2)
-        filteredUsers = users.filter(user =>
-            user.name.toLowerCase().includes(searchTerm.toLowerCase())
+        filteredUsers = users.filter(item =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
         ); 
     };
 

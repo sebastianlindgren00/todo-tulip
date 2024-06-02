@@ -7,6 +7,10 @@
 	export let url: string = '';
 	export let className: string = '';
 
+	export let onClick = () => {
+		console.log('Empty submit');
+	};
+
 	const avatarUrl = async () => {
 		// If url is provided, just return it
 		if (url != '') return url;
@@ -25,7 +29,7 @@
 	</div>
 {:then srcUrl}
 	<div class={className}>
-		<img src={srcUrl} alt="Avatar" />
+		<img src={srcUrl} alt="Avatar" on:click={onClick} />
 	</div>
 {:catch error}
 	<div class={className}>

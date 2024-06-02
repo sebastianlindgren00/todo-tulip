@@ -20,7 +20,7 @@ async function generateAvatar(seed: string) {
     const svg = createAvatar(thumbs, {
         seed: seed,
         radius: 40,
-        shapeColor: ['#f0f0f0', '#e0e0e0', '#d0d0d0', '#c0c0c0', '#b0b0b0', '#a0a0a0', '#909090', '#808080', '#707070', '#606060', '#505050', '#404040', '#303030', '#202020', '#101010', '#000000']
+        shapeColor: ['#505050', '#404040', '#303030', '#202020', '#101010', '#000000']
     }).toString();
 
     return svg;
@@ -83,13 +83,16 @@ export async function getUsersByIds(userIds: string[]) {
         // Get user details for the provided user IDs
         const users = await pb.collection('users').getList(1, 50, {
             filter: userIds.map((id) => `id="${id}"`).join("||"),
+            requestKey: null
         });
-
+        console.log('Users.items: ',users.items);
+        console.log('UserIds: ',userIds);
+        console.log('Users: ',users);
         return users.items;
     }
     catch (error) {
         console.error("Get users by IDs: ", error);
-        return [];
+        //return [];
     }
 }
 
@@ -152,7 +155,6 @@ export async function getFriendRequests() {
     try {
         const userId = pb.authStore.model?.id;
 
-        // fetch a paginated records list
         // fetch a paginated records list
         const record = await pb.collection('users').getOne(userId, {
             expand: 'friend_requests'

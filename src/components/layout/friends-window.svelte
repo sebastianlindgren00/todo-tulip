@@ -17,6 +17,7 @@
 	import SubmitButton from '@components/interface/submit-button.svelte';
 	import InputField from '@components/interface/input-field.svelte';
     import IconButton from '@components/interface/icon-button.svelte';
+	import AccountInformation from './account-information.svelte';
 
 	let openPopup, closePopup;
 	let friends = [];
@@ -143,7 +144,8 @@
 	<h1>Friend List</h1>
 	{#each friends as friend}
 		<div class="friend-card flex">
-			<Avatar className="w-5 h-5 ml-3" userId={friend.id} avatarFile={friend.avatar} />
+			<!-- <Avatar className="w-5 h-5 ml-3" userId={friend.id} avatarFile={friend.avatar} /> -->
+			<AccountInformation user={friend} />
 		    <p>{friend.name}</p>
             <IconButton icon="TrashBinSolid" color="bg-red-500" size="small" onClick={() => handleDelete(friend.id)} />
 		</div>
