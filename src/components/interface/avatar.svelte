@@ -7,7 +7,7 @@
   export let className: string = "";
 
   export let onClick = () => {
-    console.log("Empty submit");
+    console.error("Empty submit");
   };
 
   const avatarUrl = async () => {
@@ -17,15 +17,6 @@
     // If no user id or avatar file is provided, get the current user's avatar
     if (userId == "") userId = $currentUser?.id;
     if (avatarFile == "") avatarFile = $currentUser?.avatar;
-
-    // Check if avatar is cached
-    console.log("Checking if avatar is cached", cachedAvatars);
-    console.log("userId", $currentUser.id);
-
-    if (cachedAvatars[userId]) {
-      console.log("Avatar is cached");
-      return cachedAvatars[userId].url;
-    }
 
     return await getAvatar(userId, avatarFile);
   };

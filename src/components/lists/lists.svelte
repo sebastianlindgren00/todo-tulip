@@ -18,10 +18,8 @@
   onMount(() => {
     fetchLists();
     pb.collection("lists").subscribe("*", function (e) {
-      console.log("Lists subscription triggered:", e);
       switch (e.action) {
         case "create":
-          console.log(" List created!!!");
           lists = [...lists, e.record];
           break;
         case "update":

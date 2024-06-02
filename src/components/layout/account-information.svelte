@@ -7,8 +7,6 @@
   // display information of the user, with the user that was bound to the component
   export let user: any;
   export let className = "w-5 h-5 ml-3";
-
-  console.log("This is the user:", user);
 </script>
 
 <Avatar

@@ -12,10 +12,8 @@
     rejectFriendRequest,
   } from "@lib/pocketbase";
   import { onMount } from "svelte";
-  import { get } from "svelte/store";
   import Popup from "./popup.svelte";
   import FilledButton from "@components/interface/filledButton.svelte";
-  import Avatar from "@components/interface/avatar.svelte";
   import SubmitButton from "@components/interface/submit-button.svelte";
   import InputField from "@components/interface/input-field.svelte";
   import IconButton from "@components/interface/icon-button.svelte";
@@ -48,11 +46,8 @@
   });
 
   const handleFriends = async () => {
-    // console.log('Friend username:', friendUserName);
     const friend = await getUserByUsername(friendUserName);
-    // console.log('Friend:', friend);
     if (friend) {
-      // await addFriend(friendId);
       await sendFriendRequest(friend.id);
       closePopup();
     }
@@ -60,7 +55,6 @@
 
   const handleDelete = async (id) => {
     // remove a friend, with the icon button next to it
-    console.log("Friend id:", id);
     deleteFriend(id);
   };
 </script>
@@ -91,19 +85,41 @@
     </div>
     <SubmitButton text="Add Friend" onClick={handleFriends} />
   </Popup>
-  <FilledButton customStyles="w-full" onClick={openPopup} text="Lägg till vän" />
-  <div class="absolute bottom-0 left-0 w-full">
-    <div class="rounded-3xl bg-slate-200 py-2 mx-2 mb-2">
-      <h3 class="text-center">Vänförfrågningar</h3>
-      {#each friendRequests as request}
-        <div class="flex justify-between">
-          <p>{request.name}</p>
-          <div class="flex">
-            <FilledButton text="Accept" onClick={() => acceptFriendRequest(request.id)} />
-            <FilledButton text="Decline" onClick={() => rejectFriendRequest(request.id)} />
-          </div>
+  <div class="absolute bottom-3 left-0 w-full px-3 flex h-12">
+    <FilledButton customStyles="w-full" onClick={openPopup} text="Lägg till vän" />
+    <div class="ml-2 w-12 relative">
+      {#if friendRequests.length > 0}
+        <div
+          class="absolute mr-[-5px] mt-[-5px] -right-1 -top-1 h-5 w-5 z-50 bg-red-500 rounded-full text-textLight text-xs flex items-center justify-center"
+        >
+          {friendRequests.length}
         </div>
-      {/each}
+      {/if}
+      <IconButton icon="MailBoxSolid" color="bg-primaryVariant" size="large" onClick={openPopup} />
     </div>
   </div>
+  <Popup width="w-[35rem]" bind:open={openPopup} bind:close={closePopup}>
+    <div class="px-2">
+      <h3 class="text-center">Vänförfrågningar</h3>
+      <div class="grid gap-y-3">
+        {#each friendRequests as request}
+          <div class="flex justify-between">
+            <p class="self-center">{request.name}</p>
+            <div class="grid-cols-2 gap-3">
+              <FilledButton
+                text="Acceptera"
+                color="green-500"
+                onClick={() => acceptFriendRequest(request.id)}
+              />
+              <FilledButton
+                text="Neka"
+                color="red-500"
+                onClick={() => rejectFriendRequest(request.id)}
+              />
+            </div>
+          </div>
+        {/each}
+      </div>
+    </div>
+  </Popup>
 </div>
