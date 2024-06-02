@@ -8,6 +8,7 @@
 	import ShareButton from '../interface/share-button.svelte';
 	import FriendsWindow from '@components/layout/friends-window.svelte';
 	import SlideWindow from '@components/layout/slide-window.svelte';
+	import AccountInformation from './account-information.svelte';
 	import { slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
@@ -20,6 +21,7 @@
 	let isPublic = false;
 	let showFriendsWindow = false;
 	let publicListPressed = true;
+	let user = null;
 
 	// Base greeting on the time of the day
 	let time = new Date().getHours();
@@ -33,6 +35,8 @@
 	}
 
 	onMount(() => {
+		// get current user
+		user = $currentUser;
 		// split name
 		firstName = $currentUser.name.split(' ')[0];
 	});
@@ -75,14 +79,17 @@
 </script>
 
 <div class="flex-col">
-	<div class="bg-slate-100 rounded-2xl p-6 w-80 soft-shadow mx-2 mb-4">
+	<div class="bg-slate-100 rounded-2xl p-6 w-80 soft-shadow mx-2 mb-4 flex">
 		<h1>{greeting}<br />{firstName}</h1>
+		{#if user!= null}
+		<AccountInformation user={user} className = "w-20 h-20 ml-10" />
+		{/if}
 	</div>
 	<div class="bg-slate-100 rounded-2xl p-6 w-80 soft-shadow mx-2">
 		<h2>Vad vill du göra?</h2>
 		<div class="pt-3 grid gap-3">
 			<FilledButton text="Ny privat lista" customStyles="w-full" onClick={openPrivateListPopup} />
-			<FilledButton text="Ny gemensam lista" customStyles="w-full" onClick={openPublicListPopup} />
+			<FilledButton text="Ny publik lista" customStyles="w-full" onClick={openPublicListPopup} />
 			<FilledButton text="Se vänner" customStyles="w-full" onClick={openFriendWindow} />
 		</div>
 	</div>
@@ -90,12 +97,6 @@
 <Popup bind:open={openPopup} bind:close={closePopup}>
 	<form class="relative w-full h-full" on:submit|preventDefault>
 		<InputField label="Namn på lista" placeholder="Namn på lista" type="text" bind:value={title} />
-		<InputField
-			label="Beskrivning"
-			placeholder="Beskrivning"
-			type="text"
-			bind:value={description}
-		/>
 		{#if isPublic == false}
 			<ShareButton bind:shared />
 		{/if}

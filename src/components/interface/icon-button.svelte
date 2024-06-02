@@ -1,6 +1,6 @@
 <script>
 	// Icons found at https://flowbite-svelte-icons.codewithshin.com/
-	import { TrashBinSolid, PenSolid, CirclePlusSolid } from 'flowbite-svelte-icons';
+	import { TrashBinSolid, PenSolid, CirclePlusSolid, MailBoxSolid } from 'flowbite-svelte-icons';
 
 	export let icon = 'TrashBinSolid';
 	export let color = 'primary';
@@ -25,6 +25,8 @@
 				return PenSolid;
 			case 'CirclePlusSolid':
 				return CirclePlusSolid;
+			case 'MailBoxSolid':
+				return MailBoxSolid;
 			default:
 				return TrashBinSolid;
 		}

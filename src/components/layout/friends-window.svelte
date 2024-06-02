@@ -161,7 +161,7 @@
 		</div>
 		<SubmitButton text="Add Friend" onClick={handleFriends} />
 	</Popup>
-	<FilledButton customStyles="w-full" onClick={openPopup} text="Add Friend" />
+	<FilledButton customStyles="w-full" onClick={openPopup} text="Lägg till vän" />
 	<div class="absolute bottom-0 left-0 w-full">
 		<div class="rounded-3xl bg-slate-200 py-2 mx-2 mb-2">
 			<h3 class="text-center">Vänförfrågningar</h3>
