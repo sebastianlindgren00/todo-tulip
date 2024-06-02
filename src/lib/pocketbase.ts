@@ -9,6 +9,7 @@ import { goto } from '$app/navigation';
 
 const pbURL = "https://todo-tulip.pockethost.io/"
 export const pb = new PocketBase(pbURL); // remote
+pb.autoCancellation(false);
 export const currentUser = writable(pb.authStore.model);
 export const cachedUsers = writable([]);
 export const cachedAvatars = writable([{ userId: '', url: '' }]);
@@ -41,8 +42,6 @@ export async function getAvatar(userId: string, fileName: string) {
         const url = pb.files.getUrl(record, fileName, { 'thumb': '100x250' });
 
         cachedAvatars.update((avatars) => [...avatars, { userId: userId, url: url }]);
-        console.log('cachedAvatar: ', { userId: userId, url: url });
-
 
         return url;
     } catch (error) {
@@ -141,11 +140,12 @@ export async function acceptFriendRequest(friendId: string) {
         // Add the friend to the user's friends
         const friends = [...user.friends, friendId];
 
+        let data = currentUser;
+        data.friends = friends;
+        data.friend_requests = friendRequests;
+
         // Update the user's record
-        const updatedUser = await pb.collection('users').update(currentUser.id, {
-            friends: friends,
-            friend_requests: friendRequests
-        });
+        const updatedUser = await pb.collection('users').update(currentUser.id, data);
 
         // Add the user to the friend's friends
         const friend = await pb.collection('users').getOne(friendId);
@@ -153,12 +153,32 @@ export async function acceptFriendRequest(friendId: string) {
 
         // Update the friend's record
         const updatedFriend = await pb.collection('users').update(friendId, {
-            friends: friendFriends
+            friends: friendFriends,
+            requestKey: null
         });
 
         return updatedUser && updatedFriend;
     } catch (error) {
         console.error("Accept friend request: ", error);
+    }
+}
+
+export async function rejectFriendRequest(friendId: string) {
+    try {
+        const currentUser = pb.authStore.model;
+        const user = await pb.collection('users').getOne(currentUser.id);
+
+        // Remove the friend request from the user's friend_requests
+        const friendRequests = user.friend_requests.filter((id: string) => id !== friendId);
+
+        // Update the user's record
+        const updatedUser = await pb.collection('users').update(currentUser.id, {
+            friend_requests: friendRequests
+        });
+
+        return updatedUser;
+    } catch (error) {
+        console.error("Reject friend request: ", error);
     }
 }
 /* #endregion */
