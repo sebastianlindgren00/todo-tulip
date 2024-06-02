@@ -31,7 +31,7 @@
     friends = await getFriends();
     friendRequests = await getFriendRequests();
     sentRequests = await getUsersByIds($currentUser.sent_requests);
-    console.log('sent requests', sentRequests);
+    console.log("sent requests", sentRequests);
 
     pb.collection("users").subscribe(
       "*",
@@ -53,20 +53,20 @@
   const handleFriends = async () => {
     const friend = await getUserByUsername(friendUserName);
     if (friend) {
-      await sendFriendRequest(friend.id);
-      openAddPopup();
-    }
+      sendFriendRequest(friend.id);
+      closeAddPopup();
+    } else friendId = null;
   };
 </script>
 
-<div class="px-4">
+<div class="px-4 pt-4">
   <h1 class="pb-8">Dina vänner</h1>
   {#each friends as friend}
     <div class="friend-card flex pb-4">
       <AccountInformation user={friend} className="w-14 h-14" />
       <div class="self-center ml-3">
-      <p class="font-semibold">{friend.name}</p>
-      <p class="text-gray-500">@{friend.username}</p>
+        <p class="font-semibold">{friend.name}</p>
+        <p class="text-gray-500">@{friend.username}</p>
       </div>
     </div>
   {/each}
@@ -88,25 +88,25 @@
         <p>är inte ett giltig användarnamn</p>
       {/if}
     </div>
-    <SubmitButton text="Add Friend"  onClick={handleFriends} />
+    <SubmitButton text="Add Friend" onClick={handleFriends} />
   </Popup>
   <div class="absolute bottom-3 left-0 w-full px-3 flex h-12">
     <FilledButton customStyles="w-full" onClick={openAddPopup} text="Lägg till vän" />
-    <div class="ml-2 w-12 relative">
-      {#if friendRequests.length > 0}
+    {#if friendRequests.length > 0}
+      <div class="ml-2 w-12 relative">
         <div
           class="absolute mr-[-5px] mt-[-5px] -right-1 -top-1 h-5 w-5 z-50 bg-red-500 rounded-full text-textLight text-xs flex items-center justify-center"
         >
           {friendRequests.length}
         </div>
-      {/if}
-      <IconButton
-        icon="MailBoxSolid"
-        color="bg-primaryVariant"
-        size="large"
-        onClick={openRequestsPopup}
-      />
-    </div>
+        <IconButton
+          icon="MailBoxSolid"
+          color="bg-primaryVariant"
+          size="large"
+          onClick={openRequestsPopup}
+        />
+      </div>
+    {/if}
   </div>
   <Popup width="w-[35rem]" bind:open={openRequestsPopup} bind:close={closeRequestsPopup}>
     <div class="px-2">
