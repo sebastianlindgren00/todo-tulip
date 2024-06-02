@@ -10,11 +10,12 @@
     CloseCircleSolid,
   } from "flowbite-svelte-icons";
 
-  export let icon = "TrashBinSolid";
-  export let color = "primary";
-  export let size = "large";
-  export let customStyles = "";
-  export let onClick = () => {};
+	export let icon = 'TrashBinSolid';
+	export let color = 'primary';
+	export let size = 'large';
+	export let customStyles = '';
+	export let onClick = () => {};
+	export let className = '';
 
   // Set size of button
   let iconSize = "w-full h-full";
@@ -48,9 +49,9 @@
 </script>
 
 <button
-  class={`${color} icon-btn transition-all rounded-xl p-1 shadow-lg ${customStyles}
-		hover:scale-110`}
-  on:click={onClick}
+	class={`${color} icon-btn transition-all rounded-xl p-1 shadow-lg ${customStyles}
+		hover:scale-110 ` + className}
+	on:click={onClick}
 >
   <svelte:component this={iconClass} class={iconSize} />
 </button>
