@@ -19,15 +19,16 @@
   import IconButton from "@components/interface/icon-button.svelte";
   import AccountInformation from "./account-information.svelte";
 
-  let openPopup, closePopup;
+  let openAddPopup, closeAddPopup;
+  let openRequestsPopup, closeRequestsPopup;
   let friends = [];
   let friendRequests = [];
   let friendId = "";
   let friendUserName = "";
 
-	onMount(async () => {
-		friends = await getFriends();
-		friendRequests = await getFriendRequests();
+  onMount(async () => {
+    friends = await getFriends();
+    friendRequests = await getFriendRequests();
 
     pb.collection("users").subscribe(
       "*",
@@ -49,7 +50,7 @@
     const friend = await getUserByUsername(friendUserName);
     if (friend) {
       await sendFriendRequest(friend.id);
-      closePopup();
+      openAddPopup();
     }
   };
 
@@ -74,7 +75,7 @@
       />
     </div>
   {/each}
-  <Popup bind:open={openPopup} bind:close={closePopup}>
+  <Popup bind:open={openAddPopup} bind:close={closeAddPopup}>
     <div class="flex-col">
       <p>Skriv in användarnamnet på personen du vill lägga till:</p>
       <InputField placeholder="Användarnamn" type="text" bind:value={friendUserName} />
@@ -86,7 +87,7 @@
     <SubmitButton text="Add Friend" onClick={handleFriends} />
   </Popup>
   <div class="absolute bottom-3 left-0 w-full px-3 flex h-12">
-    <FilledButton customStyles="w-full" onClick={openPopup} text="Lägg till vän" />
+    <FilledButton customStyles="w-full" onClick={openAddPopup} text="Lägg till vän" />
     <div class="ml-2 w-12 relative">
       {#if friendRequests.length > 0}
         <div
@@ -95,10 +96,15 @@
           {friendRequests.length}
         </div>
       {/if}
-      <IconButton icon="MailBoxSolid" color="bg-primaryVariant" size="large" onClick={openPopup} />
+      <IconButton
+        icon="MailBoxSolid"
+        color="bg-primaryVariant"
+        size="large"
+        onClick={openRequestsPopup}
+      />
     </div>
   </div>
-  <Popup width="w-[35rem]" bind:open={openPopup} bind:close={closePopup}>
+  <Popup width="w-[35rem]" bind:open={openRequestsPopup} bind:close={closeRequestsPopup}>
     <div class="px-2">
       <h3 class="text-center">Vänförfrågningar</h3>
       <div class="grid gap-y-3">
