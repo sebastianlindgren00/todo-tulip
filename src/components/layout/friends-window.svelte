@@ -23,12 +23,15 @@
   let openRequestsPopup, closeRequestsPopup;
   let friends = [];
   let friendRequests = [];
+  let sentRequests = [];
   let friendId = "";
   let friendUserName = "";
 
   onMount(async () => {
     friends = await getFriends();
     friendRequests = await getFriendRequests();
+    sentRequests = await getUsersByIds($currentUser.sent_requests);
+    console.log('sent requests', sentRequests);
 
     pb.collection("users").subscribe(
       "*",
@@ -38,6 +41,7 @@
             if (e.record.id === $currentUser.id) {
               friends = await getUsersByIds(e.record.friends);
               friendRequests = await getUsersByIds(e.record.friend_requests);
+              sentRequests = await getUsersByIds(e.record.sent_requests);
             }
             break;
         }
@@ -53,26 +57,26 @@
       openAddPopup();
     }
   };
-
-  const handleDelete = async (id) => {
-    // remove a friend, with the icon button next to it
-    deleteFriend(id);
-  };
 </script>
 
 <div class="px-4">
-  <h1>Friend List</h1>
+  <h1 class="pb-8">Dina vänner</h1>
   {#each friends as friend}
-    <div class="friend-card flex">
-      <!-- <Avatar className="w-5 h-5 ml-3" userId={friend.id} avatarFile={friend.avatar} /> -->
-      <AccountInformation user={friend} />
-      <p>{friend.name}</p>
-      <IconButton
-        icon="UserRemoveSolid"
-        color="bg-red-500"
-        size="small"
-        onClick={() => handleDelete(friend.id)}
-      />
+    <div class="friend-card flex pb-4">
+      <AccountInformation user={friend} className="w-14 h-14" />
+      <div class="self-center ml-3">
+      <p class="font-semibold">{friend.name}</p>
+      <p class="text-gray-500">@{friend.username}</p>
+      </div>
+    </div>
+  {/each}
+  {#each sentRequests as request}
+    <div class="friend-card flex pb-4 grayscale">
+      <AccountInformation user={request} className="w-14 h-14" />
+      <div class="self-center ml-3">
+        <p class="font-semibold">{request.name}</p>
+        <p class="text-gray-500">@{request.username}</p>
+      </div>
     </div>
   {/each}
   <Popup bind:open={openAddPopup} bind:close={closeAddPopup}>
@@ -84,7 +88,7 @@
         <p>är inte ett giltig användarnamn</p>
       {/if}
     </div>
-    <SubmitButton text="Add Friend" onClick={handleFriends} />
+    <SubmitButton text="Add Friend"  onClick={handleFriends} />
   </Popup>
   <div class="absolute bottom-3 left-0 w-full px-3 flex h-12">
     <FilledButton customStyles="w-full" onClick={openAddPopup} text="Lägg till vän" />

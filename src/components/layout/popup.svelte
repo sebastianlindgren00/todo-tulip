@@ -25,7 +25,7 @@
     class="fixed inset-0 flex items-center justify-center z-10 bg-[rgba(0,0,0,0.6)] cursor-default"
     on:click={handleClick}
   >
-    <div class={"bg-white p-6 rounded-2xl z-50 " + width}>
+    <div class={"bg-white p-6 rounded-2xl relative z-50 " + width}>
       <slot />
     </div>
   </button>

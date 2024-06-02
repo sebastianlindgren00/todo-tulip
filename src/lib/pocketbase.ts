@@ -118,8 +118,13 @@ export async function sendFriendRequest(friendId: string) {
         const createdRequest = await pb.collection('users').update(friend.id, {
             friend_requests: [...friend.friend_requests, currentUser.id]
         });
+        console.log("current user friend req: ", currentUser.friend_requests);
 
-        return createdRequest;
+        const sentRequest = await pb.collection('users').update(currentUser.id, {
+            sent_requests: [...currentUser.sent_requests, friendId]
+        });
+
+        return createdRequest && sentRequest;
     } catch (error) {
         console.error("Send friend request: ", error);
     }
@@ -150,8 +155,11 @@ export async function acceptFriendRequest(friendId: string) {
         // Update the friend's record
         const updatedFriend = await pb.collection('users').update(friendId, {
             friends: friendFriends,
-            requestKey: null
+            requestKey: null,
+            sent_requests: friend.sent_requests.filter((id: string) => id !== currentUser.id)
+            
         });
+
 
         return updatedUser && updatedFriend;
     } catch (error) {
@@ -172,7 +180,11 @@ export async function rejectFriendRequest(friendId: string) {
             friend_requests: friendRequests
         });
 
-        return updatedUser;
+        const updatedFriend = await pb.collection('users').update(friendId, {
+            sent_requests: user.sent_requests.filter((id: string) => id !== currentUser.id)
+        }); 
+
+        return updatedUser && updatedFriend;
     } catch (error) {
         console.error("Reject friend request: ", error);
     }
