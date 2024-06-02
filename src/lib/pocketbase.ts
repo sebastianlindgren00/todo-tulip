@@ -56,7 +56,6 @@ export async function getUserByUsername(username: string) {
         return null;
     }
 
-    console.log('Username: ', username);
     try {
         const user = await pb.collection('users').getFirstListItem(`username = "${username}"`, {
             sort: 'created',
@@ -95,7 +94,6 @@ export async function getUsersByIds(userIds: string[]) {
 export async function sendFriendRequest(friendId: string) {
     try {
         const currentUser = pb.authStore.model;
-        console.log(friendId);
 
         const friend = await pb.collection('users').getOne(friendId);
 
@@ -103,8 +101,6 @@ export async function sendFriendRequest(friendId: string) {
             console.error("User not found");
             return;
         }
-
-        console.log(friend);
 
         // Check if the friend-user is already a friend
         if (currentUser.friends.includes(friendId)) {
@@ -209,9 +205,6 @@ export async function getFriendRequests() {
             expand: 'friend_requests'
         });
 
-        console.log(record.friend_requests);
-
-
         return await getUsersByIds(record.friend_requests);
     } catch (error) {
         console.error("Get friend requests: ", error);
@@ -313,16 +306,25 @@ export async function deleteList(listId: string) {
 // delete a friend
 export async function deleteFriend(friendId: string) {
     try {
+        // Remove the friend from the user's friends
         const userId = pb.authStore.model?.id;
         const user = await pb.collection('users').getOne(userId);
 
-        const friends = user.friends.filter((id: string) => id !== friendId);
-        const data = {
-            friends: friends
-        };
+        let friends = user.friends.filter((id: string) => id !== friendId);
 
-        const updatedUser = await pb.collection('users').update(userId, data);
-        return updatedUser;
+        const updatedUser = await pb.collection('users').update(userId, {
+            friends: friends
+        });
+
+        // Remove the user from the friend's friends
+        const friend = await pb.collection('users').getOne(friendId);
+        const friendFriends = friend.friends.filter((id: string) => id !== userId);
+
+        const updatedFriend = await pb.collection('users').update(friendId, {
+            friends: friendFriends
+        });
+
+        return updatedUser && updatedFriend;
     } catch (error) {
         console.error("Delete friend: ", error);
         return -1;

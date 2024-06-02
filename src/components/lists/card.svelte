@@ -25,7 +25,6 @@
   pb.collection("items").subscribe(
     "*",
     function (e) {
-      console.log("Subscription triggered:", e);
       switch (e.action) {
         case "create":
           if (e.record.list === listId) items = [...items, e.record];
@@ -49,7 +48,6 @@
   pb.collection("lists").subscribe(
     "*",
     function (e) {
-      console.log("Lists subscription triggered:", e);
       switch (e.action) {
         case "update":
           //if (e.record.id === listId) {
@@ -78,9 +76,7 @@
 
   onMount(async () => {
     try {
-      console.log("Shared users 1:", sharedUsers);
       sharedUserNames = await getUsersByIds(sharedUsers);
-      console.log("Shared users 2:", sharedUserNames);
     } catch (error) {
       console.error("onMount - Error fetching user details: ", error);
     }
