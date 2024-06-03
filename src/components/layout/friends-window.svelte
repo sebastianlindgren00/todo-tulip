@@ -32,6 +32,9 @@
     friends = await getFriends();
     requests = await getRequests();
 
+    console.log("friends", friends);
+    console.log("requests", requests);
+
     pb.collection("users").subscribe(
       "*",
       async function (e) {

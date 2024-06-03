@@ -223,7 +223,7 @@ export async function getRequests() {
         console.log("friend req: ", record.friend_requests, "sent req: ", record.sent_requests);
 
         return {
-            received: await getUsersByIds(record.sent_requests), sent: await getUsersByIds(record.sent_requests)
+            received: await getUsersByIds(record.friend_requests), sent: await getUsersByIds(record.sent_requests)
         };
     } catch (error) {
         console.error("Get friend requests: ", error);
